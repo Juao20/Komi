@@ -1,0 +1,7 @@
+{% extends "emails/base.html" %}
+{% block title %}Votre adresse email a été modifiée{% endblock %}
+{% block content %}
+<p style="margin:0 0 16px;font-size:20px;font-weight:700;color:#111827;">Adresse email modifiée</p>
+<p style="margin:0 0 16px;">Bonjour {{ full_name }}, l'adresse email de votre compte KOMI a été changée vers <strong>{{ new_email }}</strong>.</p>
+<p style="margin:0;color:#6b7280;font-size:13px;">Si vous n'êtes pas à l'origine de cette action, contactez immédiatement notre support en répondant à cet email.</p>
+{% endblock %}

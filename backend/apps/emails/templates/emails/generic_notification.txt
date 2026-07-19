@@ -1,0 +1,9 @@
+{{ title }}
+{% if full_name %}
+Bonjour {{ full_name }},
+{% endif %}
+{{ message }}
+{% if action_url %}
+{{ action_label|default:"En savoir plus" }} : {{ action_url }}
+{% endif %}
+— L'équipe KOMI

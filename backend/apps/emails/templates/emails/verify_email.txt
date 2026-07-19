@@ -1,0 +1,8 @@
+Bonjour {{ full_name }},
+
+Confirmez votre adresse email pour activer votre compte KOMI :
+{{ verification_url }}
+
+Ce lien expire dans 24 heures. Si vous n'êtes pas à l'origine de cette demande, ignorez cet email.
+
+— L'équipe KOMI

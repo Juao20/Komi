@@ -1,0 +1,17 @@
+{% extends "emails/base.html" %}
+{% block title %}Nouvelle commande{% endblock %}
+{% block content %}
+<p style="margin:0 0 16px;font-size:20px;font-weight:700;color:#111827;">Nouvelle commande reçue !</p>
+<p style="margin:0 0 16px;">{{ store_name }}, vous avez reçu une nouvelle commande de <strong>{{ customer_name }}</strong>.</p>
+<table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;background-color:#fafafa;border-radius:12px;margin:0 0 16px;">
+  <tr>
+    <td style="padding:16px 20px;">
+      <p style="margin:0 0 4px;color:#6b7280;font-size:12px;text-transform:uppercase;letter-spacing:.04em;">Commande</p>
+      <p style="margin:0 0 12px;font-weight:600;color:#111827;">#{{ order_number }}</p>
+      <p style="margin:0 0 4px;color:#6b7280;font-size:12px;text-transform:uppercase;letter-spacing:.04em;">Montant</p>
+      <p style="margin:0;font-weight:600;color:#111827;">{{ total_amount }} {{ currency }}</p>
+    </td>
+  </tr>
+</table>
+{% include "emails/partials/_button.html" with button_url=frontend_url|add:"/dashboard/orders" button_label="Voir la commande" %}
+{% endblock %}

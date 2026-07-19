@@ -1,0 +1,5 @@
+Bonjour {{ customer_name }},
+
+Votre commande #{{ order_number }} chez {{ store_name }} est maintenant : {{ status_label }}
+
+— L'équipe KOMI

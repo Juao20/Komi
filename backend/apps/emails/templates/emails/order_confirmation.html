@@ -1,0 +1,28 @@
+{% extends "emails/base.html" %}
+{% block title %}Confirmation de votre commande{% endblock %}
+{% block content %}
+<p style="margin:0 0 16px;font-size:20px;font-weight:700;color:#111827;">Merci pour votre commande, {{ customer_name }} !</p>
+<p style="margin:0 0 16px;">Votre commande auprès de <strong>{{ store_name }}</strong> a bien été enregistrée.</p>
+<table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;background-color:#fafafa;border-radius:12px;margin:0 0 16px;">
+  <tr>
+    <td style="padding:16px 20px;">
+      <p style="margin:0 0 12px;color:#6b7280;font-size:12px;text-transform:uppercase;letter-spacing:.04em;">Commande #{{ order_number }}</p>
+      {% for item in items %}
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:8px;">
+        <tr>
+          <td style="font-size:14px;color:#374151;">{{ item.quantity }} × {{ item.product_name }}{% if item.variant_name %} ({{ item.variant_name }}){% endif %}</td>
+          <td style="font-size:14px;color:#111827;font-weight:600;text-align:right;white-space:nowrap;">{{ item.line_total }} {{ currency }}</td>
+        </tr>
+      </table>
+      {% endfor %}
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:12px;padding-top:12px;border-top:1px solid #e5e7eb;">
+        <tr>
+          <td style="font-size:15px;font-weight:700;color:#111827;">Total</td>
+          <td style="font-size:15px;font-weight:700;color:#111827;text-align:right;">{{ total_amount }} {{ currency }}</td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<p style="margin:0;color:#6b7280;font-size:13px;">{{ store_name }} vous contactera bientôt pour la livraison.</p>
+{% endblock %}

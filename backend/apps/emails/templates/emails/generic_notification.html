@@ -1,0 +1,8 @@
+{% extends "emails/base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<p style="margin:0 0 16px;font-size:20px;font-weight:700;color:#111827;">{{ title }}</p>
+{% if full_name %}<p style="margin:0 0 16px;">Bonjour {{ full_name }},</p>{% endif %}
+<p style="margin:0 0 16px;white-space:pre-line;">{{ message }}</p>
+{% if action_url %}{% include "emails/partials/_button.html" with button_url=action_url button_label=action_label|default:"En savoir plus" %}{% endif %}
+{% endblock %}

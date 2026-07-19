@@ -1,0 +1,7 @@
+Bienvenue sur KOMI, {{ full_name }} !
+
+KOMI est le moyen le plus simple de vendre en ligne. Créez votre boutique, ajoutez vos produits et recevez vos premières commandes en quelques minutes.
+
+Créer ma boutique : {{ frontend_url }}/onboarding
+
+— L'équipe KOMI

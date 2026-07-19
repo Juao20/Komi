@@ -1,0 +1,11 @@
+{% extends "emails/base.html" %}
+{% block title %}Mise à jour de votre commande{% endblock %}
+{% block content %}
+<p style="margin:0 0 16px;font-size:20px;font-weight:700;color:#111827;">Votre commande a été mise à jour</p>
+<p style="margin:0 0 16px;">Bonjour {{ customer_name }}, votre commande <strong>#{{ order_number }}</strong> chez {{ store_name }} est maintenant :</p>
+<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 16px;">
+  <tr>
+    <td style="padding:8px 16px;background-color:#6C5CE7;border-radius:999px;color:#ffffff;font-size:14px;font-weight:600;">{{ status_label }}</td>
+  </tr>
+</table>
+{% endblock %}

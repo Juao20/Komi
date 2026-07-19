@@ -1,0 +1,7 @@
+Félicitations, {{ full_name }} !
+
+Votre boutique {{ store_name }} a été créée avec succès. Ajoutez vos produits et partagez votre lien pour commencer à vendre.
+
+Ouvrir mon Dashboard : {{ frontend_url }}/dashboard
+
+— L'équipe KOMI

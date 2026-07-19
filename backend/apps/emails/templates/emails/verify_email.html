@@ -1,0 +1,8 @@
+{% extends "emails/base.html" %}
+{% block title %}Confirmez votre adresse email{% endblock %}
+{% block content %}
+<p style="margin:0 0 16px;font-size:20px;font-weight:700;color:#111827;">Confirmez votre adresse email</p>
+<p style="margin:0 0 16px;">Bonjour {{ full_name }}, confirmez votre adresse email pour activer votre compte KOMI.</p>
+{% include "emails/partials/_button.html" with button_url=verification_url button_label="Vérifier mon adresse email" %}
+<p style="margin:16px 0 0;color:#6b7280;font-size:13px;">Ce lien expire dans 24 heures. Si vous n'êtes pas à l'origine de cette demande, ignorez cet email.</p>
+{% endblock %}

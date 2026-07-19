@@ -1,0 +1,8 @@
+{% extends "emails/base.html" %}
+{% block title %}Bienvenue sur KOMI{% endblock %}
+{% block content %}
+<p style="margin:0 0 16px;font-size:20px;font-weight:700;color:#111827;">Bienvenue sur KOMI, {{ full_name }} !</p>
+<p style="margin:0 0 16px;">KOMI est le moyen le plus simple de vendre en ligne. Créez votre boutique, ajoutez vos produits et recevez vos premières commandes en quelques minutes.</p>
+{% include "emails/partials/_button.html" with button_url=frontend_url|add:"/onboarding" button_label="Créer ma boutique" %}
+<p style="margin:16px 0 0;color:#6b7280;font-size:13px;">Des questions ? Répondez simplement à cet email.</p>
+{% endblock %}

@@ -1,0 +1,7 @@
+{% extends "emails/base.html" %}
+{% block title %}Votre boutique est prête{% endblock %}
+{% block content %}
+<p style="margin:0 0 16px;font-size:20px;font-weight:700;color:#111827;">Félicitations, {{ full_name }} !</p>
+<p style="margin:0 0 16px;">Votre boutique <strong>{{ store_name }}</strong> a été créée avec succès. Ajoutez vos produits et partagez votre lien pour commencer à vendre.</p>
+{% include "emails/partials/_button.html" with button_url=frontend_url|add:"/dashboard" button_label="Ouvrir mon Dashboard" %}
+{% endblock %}

@@ -1,0 +1,10 @@
+Nouvelle commande reçue !
+
+{{ store_name }}, vous avez reçu une nouvelle commande de {{ customer_name }}.
+
+Commande #{{ order_number }}
+Montant : {{ total_amount }} {{ currency }}
+
+Voir la commande : {{ frontend_url }}/dashboard/orders
+
+— L'équipe KOMI
