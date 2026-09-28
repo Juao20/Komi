@@ -20,6 +20,8 @@ class ProviderWebhookView(APIView):
 
     permission_classes = [AllowAny]
     authentication_classes = []
+    # Provider retries/bursts must never be rate-limited; requests are HMAC-signed.
+    throttle_classes = []
 
     def post(self, request, provider):
         try:

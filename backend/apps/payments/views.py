@@ -3,6 +3,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.core.throttling import scoped
 from apps.orders.selectors import get_order_by_public_id_unscoped
 from apps.payments import selectors, services
 from apps.payments.serializers import InitiatePaymentSerializer, PaymentSerializer
@@ -16,6 +17,7 @@ def _get_order_or_404(order_public_id):
 
 
 class InitiatePaymentView(APIView):
+    throttle_classes, throttle_scope = scoped("payment")
     permission_classes = [AllowAny]
 
     def post(self, request, order_public_id):
@@ -32,6 +34,7 @@ class InitiatePaymentView(APIView):
 
 
 class PaymentStatusView(APIView):
+    throttle_classes, throttle_scope = scoped("payment")
     permission_classes = [AllowAny]
 
     def get(self, request, order_public_id):

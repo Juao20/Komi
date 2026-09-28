@@ -88,8 +88,17 @@ def confirm_password_reset(*, uid, token, new_password):
 
     user.set_password(new_password)
     user.save(update_fields=["password"])
+    _revoke_refresh_tokens(user)
     EmailService.send_password_changed_email(user=user)
     return user
+
+
+def _revoke_refresh_tokens(user):
+    """Logs the user out everywhere: after a reset, a stolen session must not survive."""
+    from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
+
+    for token in OutstandingToken.objects.filter(user=user).exclude(blacklistedtoken__isnull=False):
+        BlacklistedToken.objects.get_or_create(token=token)
 
 
 def change_password(*, user, current_password, new_password):

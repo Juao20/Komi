@@ -8,7 +8,7 @@ import requests
 from django.conf import settings
 
 from apps.core.exceptions import ServiceError
-from apps.payments.choices import PaymentStatus
+from apps.payments.choices import PaymentMethodType, PaymentStatus
 from apps.payments.providers.base import PaymentProviderBase, TransactionResult, VerificationResult, WebhookEvent
 
 logger = logging.getLogger(__name__)
@@ -27,6 +27,20 @@ _STATUS_MAP = {
     "refunded": PaymentStatus.REFUNDED,
     "transferred": PaymentStatus.SUCCESSFUL,
 }
+
+
+def _map_payment_method(mode: str) -> str:
+    """FedaPay reports operator-specific modes (e.g. "mtn_open", "moov_tg")."""
+    mode = (mode or "").lower()
+    if not mode:
+        return ""
+    if mode.startswith("mtn"):
+        return PaymentMethodType.MTN_MOMO
+    if mode.startswith("moov"):
+        return PaymentMethodType.MOOV_MOMO
+    if "card" in mode or mode in ("visa", "mastercard"):
+        return PaymentMethodType.CARD
+    return PaymentMethodType.OTHER
 
 
 def _unwrap_transaction(payload: dict) -> dict:
@@ -97,7 +111,7 @@ class FedapayService(PaymentProviderBase):
             status=status,
             amount=Decimal(str(data.get("amount", 0))),
             currency=(data.get("currency") or {}).get("iso", ""),
-            payment_method=data.get("mode", ""),
+            payment_method=_map_payment_method(data.get("mode", "")),
             raw=data,
         )
 

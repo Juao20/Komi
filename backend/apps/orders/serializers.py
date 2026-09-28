@@ -95,8 +95,9 @@ class CreateOrderSerializer(serializers.Serializer):
     )
     customer_note = serializers.CharField(required=False, allow_blank=True)
     coupon_code = serializers.CharField(required=False, allow_blank=True, allow_null=True)
-    shipping_amount = serializers.DecimalField(max_digits=14, decimal_places=2, required=False, default=0)
-    items = OrderItemInputSerializer(many=True)
+    # shipping_amount is deliberately not accepted from the client: every amount
+    # that feeds the order total is computed server-side.
+    items = OrderItemInputSerializer(many=True, allow_empty=False, max_length=100)
 
 
 class UpdateOrderStatusSerializer(serializers.Serializer):

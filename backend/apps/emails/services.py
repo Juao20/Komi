@@ -1,4 +1,7 @@
+from functools import partial
+
 from django.conf import settings
+from django.db import transaction
 
 from apps.emails.models import EmailLog
 from apps.emails.tasks import send_email_task
@@ -10,7 +13,12 @@ def _dispatch(*, to, subject, template_name, context):
         return
     html_body, text_body = render_email_template(template_name, {"frontend_url": settings.FRONTEND_URL, **context})
     log = EmailLog.objects.create(recipient=to, subject=subject, template_name=template_name)
-    send_email_task.delay(log_id=log.id, to=to, subject=subject, html_body=html_body, text_body=text_body)
+    # Sent only once the surrounding transaction commits: no email for an order
+    # that ends up rolled back, and no slow provider call holding DB locks.
+    transaction.on_commit(
+        partial(send_email_task.delay, log_id=log.id, to=to, subject=subject, html_body=html_body, text_body=text_body),
+        robust=True,
+    )
 
 
 class EmailService:

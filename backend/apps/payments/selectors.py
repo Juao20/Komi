@@ -5,8 +5,13 @@ def get_payment_by_public_id(public_id):
     return Payment.objects.select_related("order", "store").filter(public_id=public_id).first()
 
 
-def get_payment_by_transaction_id(transaction_id):
-    return Payment.objects.select_related("order", "store").filter(transaction_id=transaction_id).first()
+def get_payment_by_transaction_id(transaction_id, for_update=False):
+    if not transaction_id:
+        return None
+    qs = Payment.objects.select_related("order", "store")
+    if for_update:
+        qs = qs.select_for_update(of=("self",))
+    return qs.filter(transaction_id=transaction_id).first()
 
 
 def get_latest_payment_for_order(order):

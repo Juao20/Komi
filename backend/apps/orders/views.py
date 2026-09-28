@@ -7,6 +7,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.core.throttling import scoped
 from apps.orders import selectors, services
 from apps.orders.filters import OrderFilter
 from apps.orders.serializers import (
@@ -66,6 +67,7 @@ class OrderCommentCreateView(StoreScopedMixin, APIView):
 
 
 class PublicCreateOrderView(APIView):
+    throttle_classes, throttle_scope = scoped("checkout")
     permission_classes = [AllowAny]
 
     def post(self, request, slug):

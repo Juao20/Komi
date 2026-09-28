@@ -7,6 +7,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.core.throttling import scoped
 from apps.products import selectors, services
 from apps.products.filters import ProductFilter
 from apps.products.serializers import (
@@ -139,6 +140,7 @@ class PublicCategoryListView(ListAPIView):
 
 
 class PublicProductReportView(APIView):
+    throttle_classes, throttle_scope = scoped("report")
     permission_classes = [AllowAny]
 
     def post(self, request, slug, product_slug):

@@ -6,6 +6,7 @@ from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 
+from apps.core.throttling import scoped
 from apps.accounts import services
 from apps.accounts.serializers import (
     ChangePasswordSerializer,
@@ -20,6 +21,7 @@ from apps.accounts.serializers import (
 
 
 class RegisterView(APIView):
+    throttle_classes, throttle_scope = scoped("auth")
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -30,6 +32,7 @@ class RegisterView(APIView):
 
 
 class LoginView(TokenObtainPairView):
+    throttle_classes, throttle_scope = scoped("auth")
     serializer_class = KomiTokenObtainPairSerializer
 
 
@@ -63,12 +66,14 @@ class VerifyEmailView(APIView):
 
 
 class ResendVerificationEmailView(APIView):
+    throttle_classes, throttle_scope = scoped("password_reset")
     def post(self, request):
         services.resend_verification_email(user=request.user)
         return Response({"detail": "Verification email sent."})
 
 
 class RequestPasswordResetView(APIView):
+    throttle_classes, throttle_scope = scoped("password_reset")
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -79,6 +84,7 @@ class RequestPasswordResetView(APIView):
 
 
 class ConfirmPasswordResetView(APIView):
+    throttle_classes, throttle_scope = scoped("auth")
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -89,6 +95,7 @@ class ConfirmPasswordResetView(APIView):
 
 
 class ChangePasswordView(APIView):
+    throttle_classes, throttle_scope = scoped("auth")
     def post(self, request):
         serializer = ChangePasswordSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

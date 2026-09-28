@@ -16,14 +16,16 @@ def _resolve_coupon(store, code, subtotal):
     if not code:
         return None, Decimal("0")
 
-    coupon = Coupon.objects.filter(store=store, code__iexact=code).first()
+    # Locked so concurrent checkouts can't both consume the last allowed use.
+    coupon = Coupon.objects.select_for_update().filter(store=store, code__iexact=code).first()
     if coupon is None or not coupon.is_valid:
         raise ServiceError("This coupon is invalid or has expired.", code="invalid_coupon")
     if subtotal < coupon.min_order_amount:
         raise ServiceError(f"This coupon requires a minimum order of {coupon.min_order_amount}.", code="coupon_min_amount")
 
     if coupon.discount_type == DiscountType.PERCENTAGE:
-        discount = subtotal * (coupon.discount_value / Decimal("100"))
+        percentage = min(coupon.discount_value, Decimal("100"))
+        discount = (subtotal * percentage / Decimal("100")).quantize(Decimal("0.01"))
     else:
         discount = min(coupon.discount_value, subtotal)
 
@@ -103,14 +105,16 @@ def create_order(
     payment_method="cash_on_delivery",
     customer_note="",
     coupon_code=None,
-    shipping_amount=Decimal("0"),
 ):
     if not items:
         raise ServiceError("An order must contain at least one item.", code="empty_order")
 
     order_items_data, subtotal = _build_order_items(store, items)
     coupon, discount_amount = _resolve_coupon(store, coupon_code, subtotal)
-    total_amount = subtotal - discount_amount + shipping_amount
+    # No shipping rates are configured per store yet, so shipping is always 0.
+    # It must never come from the client (a negative value would lower the total).
+    shipping_amount = Decimal("0")
+    total_amount = max(subtotal - discount_amount + shipping_amount, Decimal("0"))
 
     customer = get_or_create_customer(
         store=store, full_name=customer_name, phone_number=customer_phone, email=customer_email
@@ -142,7 +146,7 @@ def create_order(
     _decrement_stock(order_items_data)
 
     if coupon:
-        Coupon.objects.filter(pk=coupon.pk).update(usage_count=coupon.usage_count + 1)
+        Coupon.objects.filter(pk=coupon.pk).update(usage_count=F("usage_count") + 1)
 
     OrderStatusHistory.objects.create(order=order, from_status="", to_status=OrderStatus.PENDING)
 
@@ -221,6 +225,17 @@ def mark_order_paid(*, order):
 
     if order.status == OrderStatus.PENDING:
         update_order_status(order=order, new_status=OrderStatus.CONFIRMED, note="Paiement confirmé.")
+    elif order.status == OrderStatus.CANCELLED:
+        # The customer paid after the order was cancelled: the funds are credited
+        # like any payment, but the merchant must refund the customer.
+        from apps.notifications.services import notify_store
+
+        notify_store(
+            store=order.store,
+            category="system",
+            title="Paiement reçu sur une commande annulée",
+            message=f"La commande #{order.order_number} a été payée après son annulation. Pensez à rembourser le client.",
+        )
 
     return order
 

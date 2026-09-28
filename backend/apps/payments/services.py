@@ -31,6 +31,8 @@ def create_payment_for_order(*, order, return_url, provider=PaymentProvider.FEDA
     The amount is always recomputed from the order itself — a client can
     never influence what gets charged.
     """
+    # Lock the order so two concurrent initiations can't open two provider transactions.
+    order = type(order).objects.select_for_update().get(pk=order.pk)
     _assert_order_payable(order)
 
     existing = selectors.get_latest_payment_for_order(order)
@@ -76,7 +78,7 @@ def process_webhook(*, provider, payload: bytes, headers: dict):
 
     event = provider_service.parse_webhook_event(payload=payload, headers=headers)
 
-    payment = selectors.get_payment_by_transaction_id(event.transaction_id)
+    payment = selectors.get_payment_by_transaction_id(event.transaction_id, for_update=True)
     if payment is None:
         return None
 
@@ -96,6 +98,11 @@ def process_webhook(*, provider, payload: bytes, headers: dict):
 @transaction.atomic
 def sync_payment_from_provider(*, payment):
     """Manual/poll fallback: re-checks a payment's status directly with the provider."""
+    # Locked (and re-read) so a webhook processed concurrently can't apply the same
+    # verification twice (double notifications / order transitions).
+    payment = Payment.objects.select_for_update().get(pk=payment.pk)
+    if payment.status in TERMINAL_STATUSES:
+        return payment
     provider_service = get_provider(payment.provider)
     verification = provider_service.verify_transaction(payment.transaction_id)
     _apply_verification(payment=payment, verification=verification)

@@ -3,6 +3,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.core.throttling import scoped
 from apps.ai.serializers import (
     AIMessageSerializer,
     BuyerChatRequestSerializer,
@@ -39,6 +40,7 @@ class DailyBriefingView(StoreScopedMixin, APIView):
 
 
 class ProductAnalysisView(StoreScopedMixin, APIView):
+    throttle_classes, throttle_scope = scoped("ai_merchant")
     def get(self, request, public_id):
         product = get_product_by_public_id(self.store, public_id)
         if product is None:
@@ -48,6 +50,7 @@ class ProductAnalysisView(StoreScopedMixin, APIView):
 
 
 class MerchantChatView(StoreScopedMixin, APIView):
+    throttle_classes, throttle_scope = scoped("ai_merchant")
     def get(self, request):
         conversation = AIService().get_or_create_merchant_conversation(store=self.store, user=request.user)
         return Response(AIMessageSerializer(conversation.messages.all(), many=True).data)
@@ -64,6 +67,7 @@ class MerchantChatView(StoreScopedMixin, APIView):
 
 
 class BuyerChatView(APIView):
+    throttle_classes, throttle_scope = scoped("ai_buyer")
     permission_classes = [AllowAny]
 
     def post(self, request, slug):

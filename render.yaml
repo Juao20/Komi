@@ -60,3 +60,10 @@ services:
         sync: false
       - key: GROQ_MODEL
         value: llama-3.1-8b-instant
+      # Optional: without it the app falls back to an in-process cache
+      # (throttling then counts per gunicorn worker instead of globally).
+      - key: REDIS_URL
+        sync: false
+      # Reverse proxies in front of gunicorn, used to read the real client IP.
+      - key: NUM_PROXIES
+        value: "1"

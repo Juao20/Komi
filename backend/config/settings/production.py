@@ -19,3 +19,8 @@ CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", default="", cast=Csv())
 # False once a worker + Redis broker are deployed alongside this service.
 CELERY_TASK_ALWAYS_EAGER = config("CELERY_TASK_ALWAYS_EAGER", default=True, cast=bool)
 CELERY_TASK_EAGER_PROPAGATES = config("CELERY_TASK_EAGER_PROPAGATES", default=True, cast=bool)
+
+# Number of reverse proxies in front of gunicorn (Render's load balancer). DRF uses
+# it to read the real client IP from X-Forwarded-For for throttling, instead of
+# trusting the whole (client-controlled) header.
+REST_FRAMEWORK["NUM_PROXIES"] = config("NUM_PROXIES", default=1, cast=int)  # noqa: F405
